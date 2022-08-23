@@ -1,5 +1,5 @@
 [package]
-name = "video-x"
+name = "simple-image-stream-rs"
 version = "0.1.0"
 authors = ["Ariel"]
 edition = "2021"
