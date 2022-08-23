@@ -1,0 +1,30 @@
+[package]
+name = "video-x"
+version = "0.1.0"
+authors = ["Ariel"]
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = "2.2.17"
+image = { version="0.24.3", optional = true }
+bytebuffer-rs = "0.3.1"
+
+[features]
+debug = []
+image_incl = ["image"]
+
+[profile.release]
+opt-level = 3
+# opt-level = 'z'
+lto = true
+debug = false
+codegen-units = 1   # Reduce number of codegen units to increase optimizations.
+# panic = 'abort'     # Abort on panic
+
+# brew tap SergioBenitez/osxct
+# brew install x86_64-unknown-linux-gnu
+#
+# export CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER=x86_64-unknown-linux-gnu-gcc 
+# cargo build --release --target=x86_64-unknown-linux-gnu
