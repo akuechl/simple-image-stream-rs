@@ -1,7 +1,7 @@
 # simple-image-stream-rs
 
  ```
-Youtube Still Image Streamer 0.1.0
+Youtube Still Image Streamer 0.2.0
 
 Using images to stream to Youtube.
             To change the streamed image you can replace the image in the file system.
