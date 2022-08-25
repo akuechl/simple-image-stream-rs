@@ -1,7 +1,7 @@
 
 use std::io::{self};
 use std::path::PathBuf;
-use std::process::{Command, Stdio, ChildStdin};
+use std::process::{Command, Stdio, ChildStdin, Child};
 use std::io::{BufWriter, Write};
 use std::time::{SystemTime, UNIX_EPOCH};
 use clap::{App, Arg};
@@ -185,14 +185,25 @@ fn main() -> io::Result<()> {
         "-f", "flv",
         url
     ];
+    loop {
+        let mut ffmpeg_child = Command::new(ffmpeg)
+            .args(&para_ffmpeg)
+            .stdin(Stdio::piped())
+            .spawn()?;
 
+        if let Ok(_) = run(&ffmpeg_child, in_file, fps) {
+            break;
+        }
+        if let Err(e) = ffmpeg_child.kill() {
+            println!("Error during killing ffmpeg {}", e);
+        }
+    }
+    Ok(())
+    }
     
-    let ffmpeg_child = Command::new(ffmpeg)
-        .args(&para_ffmpeg)
-        .stdin(Stdio::piped())
-        .spawn()
-        .unwrap();
-    let mut ffmpeg_stdin = ffmpeg_child.stdin.unwrap();
+fn run(ffmpeg_child: &Child, in_file: &str, fps: u16) -> io::Result<()> {
+    
+    let mut ffmpeg_stdin = ffmpeg_child.stdin.as_ref().unwrap();
     let mut writer = BufWriter::new(&mut ffmpeg_stdin);
 
 
@@ -220,7 +231,9 @@ fn main() -> io::Result<()> {
                 }
                 if !bytes.is_empty() {
                     if let Err(e) = write_and_sleep(start, &mut writer, time_per_frame, &bytes) {
-                        println!("Error {}", e)
+                        println!("Error {}", e);
+
+                        return Err(e); // return Err -> restart ffmpeg and try again
                     }
                 }
             },
@@ -234,12 +247,12 @@ fn main() -> io::Result<()> {
 }
 
 fn image_timestamp(file_path: &str) -> io::Result<SystemTime> {
-    let metadata = fs::metadata(file_path).unwrap();
+    let metadata = fs::metadata(file_path)?;
     metadata.modified()
 }
 
-fn write_and_sleep(start: Instant, writer: &mut BufWriter<&mut ChildStdin>, time_per_frame : Duration, bytes: &Vec<u8>) -> io::Result<()> {
-    writer.write_all(bytes).unwrap();
+fn write_and_sleep(start: Instant, writer: &mut BufWriter<&mut &ChildStdin>, time_per_frame : Duration, bytes: &Vec<u8>) -> io::Result<()> {
+    writer.write_all(bytes)?;
 
     let duration_write =  Instant::now().duration_since(start);
     let duration_sleep = time_per_frame.saturating_sub(duration_write).saturating_sub(Duration::from_millis(20));
@@ -251,7 +264,7 @@ fn write_and_sleep(start: Instant, writer: &mut BufWriter<&mut ChildStdin>, time
 }
 
 fn load_image2(in_file: &str) -> io::Result<Vec<u8>> {
-    Ok(std::fs::read(in_file).ok().unwrap())
+    std::fs::read(in_file)
 }
 
 #[cfg(feature = "image_incl")]
