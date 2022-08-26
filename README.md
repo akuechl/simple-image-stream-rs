@@ -1,19 +1,22 @@
 # simple-image-stream-rs
 
  ```
-Youtube Still Image Streamer 0.2.0
+Youtube Still Image Streamer 0.3.0
 
 Using images to stream to Youtube.
             To change the streamed image you can replace the image in the file system.
-            
+        
             You needs an installed ffmpeg.
 
 USAGE:
-    video-x [OPTIONS] <PATH> <URL>
+    simple-image-stream-rs [FLAGS] [OPTIONS] <PATH> <URL>
 
 FLAGS:
         --help       
             Prints help information
+
+        --nostats    
+            Do not print ffmpeg frame stats
 
     -V, --version    
             Prints version information

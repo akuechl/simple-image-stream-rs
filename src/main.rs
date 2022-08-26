@@ -89,6 +89,11 @@ fn main() -> io::Result<()> {
                 .takes_value(true)
                 .default_value("ffmpeg")
         ).arg(
+            Arg::with_name("nostats")
+                .long("nostats")
+                .help("Do not print ffmpeg frame stats")
+        
+        ).arg(
             Arg::with_name("image_incl")
                 .value_name("PATH")
                 .help("The image is sent. If you want to change the image, overwrite the image at the same position.")
@@ -103,6 +108,7 @@ fn main() -> io::Result<()> {
                 .required(true)
                 .validator(validate_url),
         )
+    
         .get_matches();
 
     let width  = matches
@@ -133,6 +139,8 @@ fn main() -> io::Result<()> {
     let ffmpeg =  matches
         .value_of("ffmpeg")
         .unwrap();
+    let nostats = matches
+        .is_present("nostats");
     let in_file = 
         matches
         .value_of("image_incl")
@@ -147,6 +155,7 @@ fn main() -> io::Result<()> {
     let gop = &format!("{}", 4 * fps);
     let quality = &format!("{}", quality);
     let fps_para = &format!("{}", fps);
+    let nostats_para = if nostats { "-nostats" } else { "-stats" };
 
     let para_ffmpeg = vec![
         //"-y", 
@@ -182,6 +191,7 @@ fn main() -> io::Result<()> {
         // "-shortest",
         // "/Users/akuechler/Documents/rust-workspace/video-x/target/test.mp4"
         "-hide_banner",
+        nostats_para,
         "-f", "flv",
         url
     ];
