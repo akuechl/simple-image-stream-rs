@@ -4,9 +4,9 @@
 Youtube Still Image Streamer 0.3.0
 
 Using images to stream to Youtube.
-            To change the streamed image you can replace the image in the file system.
+To change the streamed image you can replace the image in the file system.
         
-            You needs an installed ffmpeg.
+You needs an installed ffmpeg.
 
 USAGE:
     simple-image-stream-rs [FLAGS] [OPTIONS] <PATH> <URL>
